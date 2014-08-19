@@ -8,7 +8,7 @@ import akka.actor.ActorSystem
 import akka.dispatch.MailboxType
 import akka.actor.ActorRef
 import akka.actor.ActorRefWithCell
-import akka.stream.io.StreamTcpManager
+import akka.stream.io.{StreamUdpManager, StreamTcpManager}
 import akka.actor.Actor
 
 /**
@@ -26,7 +26,7 @@ private[akka] case class StreamTestDefaultMailbox() extends MailboxType with Pro
         val actorClass = r.underlying.props.actorClass
         assert(actorClass != classOf[Actor], s"Don't use anonymous actor classes, actor class for $r was [${actorClass.getName}]")
         // StreamTcpManager is allowed to use another dispatcher
-        assert(!actorClass.getName.startsWith("akka.stream.") || actorClass == classOf[StreamTcpManager],
+        assert(!actorClass.getName.startsWith("akka.stream.") || actorClass == classOf[StreamTcpManager]|| actorClass == classOf[StreamUdpManager],
           s"$r with actor class [${actorClass.getName}] must not run on default dispatcher in tests. " +
             "Have you forgot to define `props.withDispatcher` when creating the actor? " +
             """Or have you forgot to use `MaterializerSettings(dispatcher = "akka.test.stream-dispatcher")` in the test?""")
